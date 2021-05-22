@@ -49,7 +49,8 @@ function useTFLite(segmentationConfig: SegmentationConfig) {
         (isSIMDSupported && !tfliteSIMD) ||
         (!isSIMDSupported && segmentationConfig.backend === 'wasmSimd') ||
         (segmentationConfig.model !== 'meet' &&
-          segmentationConfig.model !== 'mlkit')
+          segmentationConfig.model !== 'mlkit' &&
+          segmentationConfig.model !== 'bodyPix-tflite')
       ) {
         return
       }

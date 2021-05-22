@@ -36,6 +36,18 @@ function SegmentationConfigCard(props: SegmentationConfigCardProps) {
         pipeline = 'canvas2dCpu'
         break
 
+      case 'bodyPix-tflite':
+        if (
+          (backend !== 'wasm' && backend !== 'wasmSimd') ||
+          inputResolution !== '320x240' ||
+          pipeline !== 'canvas2dCpu'
+        ) {
+          backend = props.isSIMDSupported ? 'wasmSimd' : 'wasm'
+          inputResolution = '320x240'
+          pipeline = 'canvas2dCpu'
+        }
+        break
+
       case 'meet':
         if (
           (backend !== 'wasm' && backend !== 'wasmSimd') ||
@@ -104,7 +116,8 @@ function SegmentationConfigCard(props: SegmentationConfigCardProps) {
             >
               <MenuItem value="meet">Meet</MenuItem>
               <MenuItem value="mlkit">ML Kit</MenuItem>
-              <MenuItem value="bodyPix">BodyPix</MenuItem>
+              <MenuItem value="bodyPix-tflite">BodyPix (TFLite)</MenuItem>
+              <MenuItem value="bodyPix">BodyPix (TF.js)</MenuItem>
             </Select>
           </FormControl>
           <FormControl className={classes.formControl} variant="outlined">
@@ -150,6 +163,12 @@ function SegmentationConfigCard(props: SegmentationConfigCardProps) {
                 640x360
               </MenuItem>
               <MenuItem
+                value="320x240"
+                disabled={props.config.model !== 'bodyPix-tflite'}
+              >
+                320x240
+              </MenuItem>
+              <MenuItem
                 value="256x256"
                 disabled={props.config.model !== 'mlkit'}
               >
@@ -175,7 +194,10 @@ function SegmentationConfigCard(props: SegmentationConfigCardProps) {
             >
               <MenuItem
                 value="webgl2"
-                disabled={props.config.model === 'bodyPix'}
+                disabled={
+                  props.config.model === 'bodyPix' ||
+                  props.config.model === 'bodyPix-tflite'
+                }
               >
                 WebGL 2
               </MenuItem>

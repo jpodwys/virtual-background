@@ -1,11 +1,17 @@
-export type SegmentationModel = 'bodyPix' | 'meet' | 'mlkit'
+export type SegmentationModel = 'bodyPix' | 'bodyPix-tflite' | 'meet' | 'mlkit'
 export type SegmentationBackend = 'webgl' | 'wasm' | 'wasmSimd'
-export type InputResolution = '640x360' | '256x256' | '256x144' | '160x96'
+export type InputResolution =
+  | '640x360'
+  | '320x240'
+  | '256x256'
+  | '256x144'
+  | '160x96'
 
 export const inputResolutions: {
   [resolution in InputResolution]: [number, number]
 } = {
   '640x360': [640, 360],
+  '320x240': [320, 240],
   '256x256': [256, 256],
   '256x144': [256, 144],
   '160x96': [160, 96],
@@ -25,6 +31,9 @@ export function getTFLiteModelFileName(
   inputResolution: InputResolution
 ) {
   switch (model) {
+    case 'bodyPix-tflite':
+      return 'bodypix/bodypix_025_320x240_float16_quant'
+
     case 'meet':
       return inputResolution === '256x144' ? 'segm_full_v679' : 'segm_lite_v681'
 

@@ -19,9 +19,8 @@ export function buildCanvas2dPipeline(
 ) {
   const ctx = canvas.getContext('2d')!
 
-  const [segmentationWidth, segmentationHeight] = inputResolutions[
-    segmentationConfig.inputResolution
-  ]
+  const [segmentationWidth, segmentationHeight] =
+    inputResolutions[segmentationConfig.inputResolution]
   const segmentationPixelCount = segmentationWidth * segmentationHeight
   const segmentationMask = new ImageData(segmentationWidth, segmentationHeight)
   const segmentationMaskCanvas = document.createElement('canvas')
@@ -79,7 +78,8 @@ export function buildCanvas2dPipeline(
 
     if (
       segmentationConfig.model === 'meet' ||
-      segmentationConfig.model === 'mlkit'
+      segmentationConfig.model === 'mlkit' ||
+      segmentationConfig.model === 'bodyPix-tflite'
     ) {
       const imageData = segmentationMaskCtx.getImageData(
         0,
@@ -124,6 +124,8 @@ export function buildCanvas2dPipeline(
       } else if (segmentationConfig.model === 'mlkit') {
         const person = tflite.HEAPF32[outputMemoryOffset + i]
         segmentationMask.data[i * 4 + 3] = 255 * person
+      } else if (segmentationConfig.model === 'bodyPix-tflite') {
+        // TODO Decode bodypix segmentation output
       }
     }
     segmentationMaskCtx.putImageData(segmentationMask, 0, 0)
