@@ -28,8 +28,14 @@ export function buildCanvas2dPipeline(
   segmentationMaskCanvas.height = segmentationHeight
   const segmentationMaskCtx = segmentationMaskCanvas.getContext('2d')!
 
+  const outputTensorIndex =
+    segmentationConfig.model === 'bodyPix-tflite' ? 3 : 0
+
   const inputMemoryOffset = tflite._getInputMemoryOffset() / 4
-  const outputMemoryOffset = tflite._getOutputMemoryOffset() / 4
+  const outputMemoryOffset =
+    tflite._getOutputMemoryOffset(outputTensorIndex) / 4
+  const outputWidth = tflite._getOutputWidth(outputTensorIndex)
+  const outputPixelRatio = outputWidth / segmentationWidth
 
   let postProcessingConfig: PostProcessingConfig
 
@@ -89,11 +95,21 @@ export function buildCanvas2dPipeline(
       )
 
       for (let i = 0; i < segmentationPixelCount; i++) {
-        tflite.HEAPF32[inputMemoryOffset + i * 3] = imageData.data[i * 4] / 255
-        tflite.HEAPF32[inputMemoryOffset + i * 3 + 1] =
-          imageData.data[i * 4 + 1] / 255
-        tflite.HEAPF32[inputMemoryOffset + i * 3 + 2] =
-          imageData.data[i * 4 + 2] / 255
+        if (segmentationConfig.model === 'bodyPix-tflite') {
+          tflite.HEAPF32[inputMemoryOffset + i * 3] =
+            imageData.data[i * 4] / 127.5 - 1
+          tflite.HEAPF32[inputMemoryOffset + i * 3 + 1] =
+            imageData.data[i * 4 + 1] / 127.5 - 1
+          tflite.HEAPF32[inputMemoryOffset + i * 3 + 2] =
+            imageData.data[i * 4 + 2] / 127.5 - 1
+        } else {
+          tflite.HEAPF32[inputMemoryOffset + i * 3] =
+            imageData.data[i * 4] / 255
+          tflite.HEAPF32[inputMemoryOffset + i * 3 + 1] =
+            imageData.data[i * 4 + 1] / 255
+          tflite.HEAPF32[inputMemoryOffset + i * 3 + 2] =
+            imageData.data[i * 4 + 2] / 255
+        }
       }
     }
   }
@@ -125,7 +141,14 @@ export function buildCanvas2dPipeline(
         const person = tflite.HEAPF32[outputMemoryOffset + i]
         segmentationMask.data[i * 4 + 3] = 255 * person
       } else if (segmentationConfig.model === 'bodyPix-tflite') {
-        // TODO Decode bodypix segmentation output
+        const x = i % segmentationWidth
+        const y = Math.floor(i / segmentationWidth)
+        const outX = Math.floor(x * outputPixelRatio)
+        const outY = Math.floor(y * outputPixelRatio)
+        const j = outX * outY
+        const person = tflite.HEAPF32[outputMemoryOffset + j]
+        const personSigmoid = 1 / (1 + Math.exp(-person))
+        segmentationMask.data[i * 4 + 3] = 255 * personSigmoid
       }
     }
     segmentationMaskCtx.putImageData(segmentationMask, 0, 0)

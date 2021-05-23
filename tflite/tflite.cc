@@ -41,23 +41,23 @@ int getInputChannelCount() {
 }
 
 EMSCRIPTEN_KEEPALIVE
-float* getOutputMemoryOffset() {
-  return interpreter->typed_output_tensor<float>(0);
+float* getOutputMemoryOffset(int tensorIndex) {
+  return interpreter->typed_output_tensor<float>(tensorIndex);
 }
 
 EMSCRIPTEN_KEEPALIVE
-int getOutputHeight() {
-  return interpreter->output_tensor(0)->dims->data[1];
+int getOutputHeight(int tensorIndex) {
+  return interpreter->output_tensor(tensorIndex)->dims->data[1];
 }
 
 EMSCRIPTEN_KEEPALIVE
-int getOutputWidth() {
-  return interpreter->output_tensor(0)->dims->data[2];
+int getOutputWidth(int tensorIndex) {
+  return interpreter->output_tensor(tensorIndex)->dims->data[2];
 }
 
 EMSCRIPTEN_KEEPALIVE
-int getOutputChannelCount() {
-  return interpreter->output_tensor(0)->dims->data[3];
+int getOutputChannelCount(int tensorIndex) {
+  return interpreter->output_tensor(tensorIndex)->dims->data[3];
 }
 
 EMSCRIPTEN_KEEPALIVE

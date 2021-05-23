@@ -13,10 +13,10 @@ export interface TFLite extends EmscriptenModule {
   _getInputHeight(): number
   _getInputWidth(): number
   _getInputChannelCount(): number
-  _getOutputMemoryOffset(): number
-  _getOutputHeight(): number
-  _getOutputWidth(): number
-  _getOutputChannelCount(): number
+  _getOutputMemoryOffset(tensorIndex: number): number
+  _getOutputHeight(tensorIndex: number): number
+  _getOutputWidth(tensorIndex: number): number
+  _getOutputChannelCount(tensorIndex: number): number
   _loadModel(bufferSize: number): number
   _runInference(): number
 }
@@ -95,15 +95,24 @@ function useTFLite(segmentationConfig: SegmentationConfig) {
       console.log('Input width:', newSelectedTFLite._getInputWidth())
       console.log('Input channels:', newSelectedTFLite._getInputChannelCount())
 
+      const outputTensorIndex =
+        segmentationConfig.model === 'bodyPix-tflite' ? 3 : 0
+
       console.log(
         'Output memory offset:',
-        newSelectedTFLite._getOutputMemoryOffset()
+        newSelectedTFLite._getOutputMemoryOffset(outputTensorIndex)
       )
-      console.log('Output height:', newSelectedTFLite._getOutputHeight())
-      console.log('Output width:', newSelectedTFLite._getOutputWidth())
+      console.log(
+        'Output height:',
+        newSelectedTFLite._getOutputHeight(outputTensorIndex)
+      )
+      console.log(
+        'Output width:',
+        newSelectedTFLite._getOutputWidth(outputTensorIndex)
+      )
       console.log(
         'Output channels:',
-        newSelectedTFLite._getOutputChannelCount()
+        newSelectedTFLite._getOutputChannelCount(outputTensorIndex)
       )
 
       setSelectedTFLite(newSelectedTFLite)

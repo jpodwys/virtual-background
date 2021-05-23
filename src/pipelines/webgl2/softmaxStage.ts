@@ -38,12 +38,15 @@ export function buildSoftmaxStage(
     }
   `
 
-  // TFLite memory will be accessed as float32
-  const tfliteOutputMemoryOffset = tflite._getOutputMemoryOffset() / 4
+  const outputTensorIndex =
+    segmentationConfig.model === 'bodyPix-tflite' ? 3 : 0
 
-  const [segmentationWidth, segmentationHeight] = inputResolutions[
-    segmentationConfig.inputResolution
-  ]
+  // TFLite memory will be accessed as float32
+  const tfliteOutputMemoryOffset =
+    tflite._getOutputMemoryOffset(outputTensorIndex) / 4
+
+  const [segmentationWidth, segmentationHeight] =
+    inputResolutions[segmentationConfig.inputResolution]
 
   const fragmentShader = compileShader(
     gl,
