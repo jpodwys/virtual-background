@@ -1,5 +1,5 @@
 export type BackgroundConfig = {
-  type: 'none' | 'blur' | 'image'
+  type: 'blur'
   url?: string
 }
 

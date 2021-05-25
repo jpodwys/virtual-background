@@ -1,114 +1,55 @@
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
-import { useEffect, useState } from 'react'
-import BackgroundConfigCard from './core/components/BackgroundConfigCard'
-import PostProcessingConfigCard from './core/components/PostProcessingConfigCard'
-import SegmentationConfigCard from './core/components/SegmentationConfigCard'
-import SourceConfigCard from './core/components/SourceConfigCard'
-import ViewerCard from './core/components/ViewerCard'
-import {
-  BackgroundConfig,
-  backgroundImageUrls
-} from './core/helpers/backgroundHelper'
-import { PostProcessingConfig } from './core/helpers/postProcessingHelper'
-import { SegmentationConfig } from './core/helpers/segmentationHelper'
-import { SourceConfig, sourceImageUrls } from './core/helpers/sourceHelper'
-import useTFLite from './core/hooks/useTFLite'
+import { useEffect } from 'react';
+import { BackgroundConfig } from './core/helpers/backgroundHelper';
+import { SegmentationConfig } from './core/helpers/segmentationHelper';
+import pipeline from './core/vanilla/pipeline';
+import { getTFLite, TFLite } from './core/vanilla/TFLite';
+import setupVideo from './core/vanilla/track';
 
 function App() {
-  const classes = useStyles()
-  const [sourceConfig, setSourceConfig] = useState<SourceConfig>({
-    type: 'image',
-    url: sourceImageUrls[0],
-  })
-  const [backgroundConfig, setBackgroundConfig] = useState<BackgroundConfig>({
-    type: 'image',
-    url: backgroundImageUrls[0],
-  })
-  const [
-    segmentationConfig,
-    setSegmentationConfig,
-  ] = useState<SegmentationConfig>({
-    model: 'meet',
-    backend: 'wasm',
-    inputResolution: '160x96',
-    pipeline: 'webgl2',
-  })
-  const [
-    postProcessingConfig,
-    setPostProcessingConfig,
-  ] = useState<PostProcessingConfig>({
-    smoothSegmentationMask: true,
-    jointBilateralFilter: { sigmaSpace: 1, sigmaColor: 0.1 },
-    coverage: [0.5, 0.75],
-    lightWrapping: 0.3,
-    blendMode: 'screen',
-  })
-  const { tflite, isSIMDSupported } = useTFLite(segmentationConfig)
+  let tflite;
+  let isSIMDSupported: boolean = false;
+  let webglPipeline: any;
 
   useEffect(() => {
-    setSegmentationConfig((previousSegmentationConfig) => {
-      if (previousSegmentationConfig.backend === 'wasm' && isSIMDSupported) {
-        return { ...previousSegmentationConfig, backend: 'wasmSimd' }
-      } else {
-        return previousSegmentationConfig
+    async function setup() {
+      try {
+        const video = document.getElementById('input') as HTMLVideoElement;
+        const canvas = document.getElementById('output') as HTMLCanvasElement;
+        await setupVideo(video);
+        ({ tflite, isSIMDSupported } = await getTFLite());
+        const { videoWidth: width, videoHeight: height } = video;
+        canvas.width = width as number;
+        canvas.height = height as number;
+        video.width = width as number;
+        video.height = height as number;
+        const backgroundConfig: BackgroundConfig = { type: 'blur' };
+        const segmentationConfig: SegmentationConfig = {
+          model: 'meet',
+          backend: 'wasm',
+          inputResolution: '160x96',
+          pipeline: 'webgl2'
+        };
+        ({ webglPipeline } = pipeline(video, canvas, backgroundConfig, segmentationConfig, tflite as TFLite));
+        webglPipeline.render();
+      } catch (error) {
+        console.error('Error opening video camera.', error)
       }
-    })
-  }, [isSIMDSupported])
+    }
+
+    setup()
+  }, [])
 
   return (
-    <div className={classes.root}>
-      <ViewerCard
-        sourceConfig={sourceConfig}
-        backgroundConfig={backgroundConfig}
-        segmentationConfig={segmentationConfig}
-        postProcessingConfig={postProcessingConfig}
-        tflite={tflite}
-      />
-      <SourceConfigCard config={sourceConfig} onChange={setSourceConfig} />
-      <BackgroundConfigCard
-        config={backgroundConfig}
-        onChange={setBackgroundConfig}
-      />
-      <SegmentationConfigCard
-        config={segmentationConfig}
-        isSIMDSupported={isSIMDSupported}
-        onChange={setSegmentationConfig}
-      />
-      <PostProcessingConfigCard
-        config={postProcessingConfig}
-        pipeline={segmentationConfig.pipeline}
-        onChange={setPostProcessingConfig}
-      />
+    <div>
+      <video id="input"
+        autoPlay={true}
+        playsInline={true}
+        controls={false}
+        muted
+      ></video>
+      <canvas id="output"></canvas>
     </div>
   )
 }
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      display: 'grid',
-
-      [theme.breakpoints.up('xs')]: {
-        margin: theme.spacing(1),
-        gap: theme.spacing(1),
-        gridTemplateColumns: '1fr',
-      },
-
-      [theme.breakpoints.up('md')]: {
-        margin: theme.spacing(2),
-        gap: theme.spacing(2),
-        gridTemplateColumns: 'repeat(2, 1fr)',
-      },
-
-      [theme.breakpoints.up('lg')]: {
-        gridTemplateColumns: 'repeat(3, 1fr)',
-      },
-    },
-    resourceSelectionCards: {
-      display: 'flex',
-      flexDirection: 'column',
-    },
-  })
-)
 
 export default App

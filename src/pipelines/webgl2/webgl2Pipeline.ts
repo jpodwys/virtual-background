@@ -2,27 +2,20 @@ import { BackgroundConfig } from '../../core/helpers/backgroundHelper'
 import { PostProcessingConfig } from '../../core/helpers/postProcessingHelper'
 import {
   inputResolutions,
-  SegmentationConfig,
+  SegmentationConfig
 } from '../../core/helpers/segmentationHelper'
-import { SourcePlayback } from '../../core/helpers/sourceHelper'
-import { TFLite } from '../../core/hooks/useTFLite'
+import { TFLite } from '../../core/vanilla/TFLite'
 import { compileShader, createTexture, glsl } from '../helpers/webglHelper'
 import {
   BackgroundBlurStage,
-  buildBackgroundBlurStage,
+  buildBackgroundBlurStage
 } from './backgroundBlurStage'
-import {
-  BackgroundImageStage,
-  buildBackgroundImageStage,
-} from './backgroundImageStage'
 import { buildJointBilateralFilterStage } from './jointBilateralFilterStage'
-import { buildLoadSegmentationStage } from './loadSegmentationStage'
 import { buildResizingStage } from './resizingStage'
 import { buildSoftmaxStage } from './softmaxStage'
 
 export function buildWebGL2Pipeline(
-  sourcePlayback: SourcePlayback,
-  backgroundImage: HTMLImageElement | null,
+  video: HTMLVideoElement,
   backgroundConfig: BackgroundConfig,
   segmentationConfig: SegmentationConfig,
   canvas: HTMLCanvasElement,
@@ -42,7 +35,9 @@ export function buildWebGL2Pipeline(
     }
   `
 
-  const { width: frameWidth, height: frameHeight } = sourcePlayback
+  const { videoWidth: width, videoHeight: height } = video;
+  const frameWidth: number = width ?? 0;
+  const frameHeight: number = height ?? 0;
   const [segmentationWidth, segmentationHeight] = inputResolutions[
     segmentationConfig.inputResolution
   ]
@@ -103,26 +98,15 @@ export function buildWebGL2Pipeline(
     segmentationConfig,
     tflite
   )
-  const loadSegmentationStage =
-    segmentationConfig.model === 'meet'
-      ? buildSoftmaxStage(
-          gl,
-          vertexShader,
-          positionBuffer,
-          texCoordBuffer,
-          segmentationConfig,
-          tflite,
-          segmentationTexture
-        )
-      : buildLoadSegmentationStage(
-          gl,
-          vertexShader,
-          positionBuffer,
-          texCoordBuffer,
-          segmentationConfig,
-          tflite,
-          segmentationTexture
-        )
+  const loadSegmentationStage = buildSoftmaxStage(
+    gl,
+    vertexShader,
+    positionBuffer,
+    texCoordBuffer,
+    segmentationConfig,
+    tflite,
+    segmentationTexture
+  )
   const jointBilateralFilterStage = buildJointBilateralFilterStage(
     gl,
     vertexShader,
@@ -133,24 +117,14 @@ export function buildWebGL2Pipeline(
     personMaskTexture,
     canvas
   )
-  const backgroundStage =
-    backgroundConfig.type === 'blur'
-      ? buildBackgroundBlurStage(
-          gl,
-          vertexShader,
-          positionBuffer,
-          texCoordBuffer,
-          personMaskTexture,
-          canvas
-        )
-      : buildBackgroundImageStage(
-          gl,
-          positionBuffer,
-          texCoordBuffer,
-          personMaskTexture,
-          backgroundImage,
-          canvas
-        )
+  const backgroundStage = buildBackgroundBlurStage(
+    gl,
+    vertexShader,
+    positionBuffer,
+    texCoordBuffer,
+    personMaskTexture,
+    canvas
+  )
 
   async function render() {
     gl.clearColor(0, 0, 0, 0)
@@ -167,7 +141,7 @@ export function buildWebGL2Pipeline(
       gl.RGBA,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
-      sourcePlayback.htmlElement
+      video
     )
 
     gl.bindVertexArray(vertexArray)
@@ -195,22 +169,8 @@ export function buildWebGL2Pipeline(
       postProcessingConfig.jointBilateralFilter.sigmaColor
     )
 
-    if (backgroundConfig.type === 'image') {
-      const backgroundImageStage = backgroundStage as BackgroundImageStage
-      backgroundImageStage.updateCoverage(postProcessingConfig.coverage)
-      backgroundImageStage.updateLightWrapping(
-        postProcessingConfig.lightWrapping
-      )
-      backgroundImageStage.updateBlendMode(postProcessingConfig.blendMode)
-    } else if (backgroundConfig.type === 'blur') {
-      const backgroundBlurStage = backgroundStage as BackgroundBlurStage
-      backgroundBlurStage.updateCoverage(postProcessingConfig.coverage)
-    } else {
-      // TODO Handle no background in a separate pipeline path
-      const backgroundImageStage = backgroundStage as BackgroundImageStage
-      backgroundImageStage.updateCoverage([0, 0.9999])
-      backgroundImageStage.updateLightWrapping(0)
-    }
+    const backgroundBlurStage = backgroundStage as BackgroundBlurStage
+    backgroundBlurStage.updateCoverage(postProcessingConfig.coverage)
   }
 
   function cleanUp() {

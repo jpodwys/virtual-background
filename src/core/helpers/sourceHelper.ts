@@ -1,10 +1,9 @@
 export type SourceConfig = {
-  type: 'image' | 'video' | 'camera'
-  url?: string
+  type: 'camera'
 }
 
 export type SourcePlayback = {
-  htmlElement: HTMLImageElement | HTMLVideoElement
+  htmlElement: HTMLVideoElement
   width: number
   height: number
 }

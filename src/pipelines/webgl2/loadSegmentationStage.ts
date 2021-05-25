@@ -1,13 +1,13 @@
 import {
   inputResolutions,
-  SegmentationConfig,
+  SegmentationConfig
 } from '../../core/helpers/segmentationHelper'
-import { TFLite } from '../../core/hooks/useTFLite'
+import { TFLite } from '../../core/vanilla/TFLite'
 import {
   compileShader,
   createPiplelineStageProgram,
   createTexture,
-  glsl,
+  glsl
 } from '../helpers/webglHelper'
 
 export function buildLoadSegmentationStage(
