@@ -1,7 +1,6 @@
 import Avatar from '@material-ui/core/Avatar'
 import Paper from '@material-ui/core/Paper'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
-import { BodyPix } from '@tensorflow-models/body-pix'
 import { useEffect, useState } from 'react'
 import { BackgroundConfig } from '../helpers/backgroundHelper'
 import { PostProcessingConfig } from '../helpers/postProcessingHelper'
@@ -16,7 +15,6 @@ type ViewerCardProps = {
   backgroundConfig: BackgroundConfig
   segmentationConfig: SegmentationConfig
   postProcessingConfig: PostProcessingConfig
-  bodyPix?: BodyPix
   tflite?: TFLite
 }
 
@@ -34,13 +32,12 @@ function ViewerCard(props: ViewerCardProps) {
         sourceConfig={props.sourceConfig}
         onLoad={setSourcePlayback}
       />
-      {sourcePlayback && props.bodyPix && props.tflite ? (
+      {sourcePlayback && props.tflite ? (
         <OutputViewer
           sourcePlayback={sourcePlayback}
           backgroundConfig={props.backgroundConfig}
           segmentationConfig={props.segmentationConfig}
           postProcessingConfig={props.postProcessingConfig}
-          bodyPix={props.bodyPix}
           tflite={props.tflite}
         />
       ) : (

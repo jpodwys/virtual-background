@@ -1,6 +1,5 @@
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 import Typography from '@material-ui/core/Typography'
-import { BodyPix } from '@tensorflow-models/body-pix'
 import React, { useEffect } from 'react'
 import { BackgroundConfig } from '../helpers/backgroundHelper'
 import { PostProcessingConfig } from '../helpers/postProcessingHelper'
@@ -14,7 +13,6 @@ type OutputViewerProps = {
   backgroundConfig: BackgroundConfig
   segmentationConfig: SegmentationConfig
   postProcessingConfig: PostProcessingConfig
-  bodyPix: BodyPix
   tflite: TFLite
 }
 
@@ -30,7 +28,6 @@ function OutputViewer(props: OutputViewerProps) {
     props.sourcePlayback,
     props.backgroundConfig,
     props.segmentationConfig,
-    props.bodyPix,
     props.tflite
   )
 

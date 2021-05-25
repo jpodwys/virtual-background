@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   getTFLiteModelFileName,
-  SegmentationConfig,
+  SegmentationConfig
 } from '../helpers/segmentationHelper'
 
 declare function createTFLiteModule(): Promise<TFLite>
@@ -47,9 +47,7 @@ function useTFLite(segmentationConfig: SegmentationConfig) {
       if (
         !tflite ||
         (isSIMDSupported && !tfliteSIMD) ||
-        (!isSIMDSupported && segmentationConfig.backend === 'wasmSimd') ||
-        (segmentationConfig.model !== 'meet' &&
-          segmentationConfig.model !== 'mlkit')
+        (!isSIMDSupported && segmentationConfig.backend === 'wasmSimd')
       ) {
         return
       }

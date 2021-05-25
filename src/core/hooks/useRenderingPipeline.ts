@@ -1,6 +1,4 @@
-import { BodyPix } from '@tensorflow-models/body-pix'
 import { useEffect, useRef, useState } from 'react'
-import { buildCanvas2dPipeline } from '../../pipelines/canvas2d/canvas2dPipeline'
 import { buildWebGL2Pipeline } from '../../pipelines/webgl2/webgl2Pipeline'
 import { BackgroundConfig } from '../helpers/backgroundHelper'
 import { RenderingPipeline } from '../helpers/renderingPipelineHelper'
@@ -12,7 +10,6 @@ function useRenderingPipeline(
   sourcePlayback: SourcePlayback,
   backgroundConfig: BackgroundConfig,
   segmentationConfig: SegmentationConfig,
-  bodyPix: BodyPix,
   tflite: TFLite
 ) {
   const [pipeline, setPipeline] = useState<RenderingPipeline | null>(null)
@@ -34,26 +31,15 @@ function useRenderingPipeline(
 
     let renderRequestId: number
 
-    const newPipeline =
-      segmentationConfig.pipeline === 'webgl2'
-        ? buildWebGL2Pipeline(
-            sourcePlayback,
-            backgroundImageRef.current,
-            backgroundConfig,
-            segmentationConfig,
-            canvasRef.current,
-            tflite,
-            addFrameEvent
-          )
-        : buildCanvas2dPipeline(
-            sourcePlayback,
-            backgroundConfig,
-            segmentationConfig,
-            canvasRef.current,
-            bodyPix,
-            tflite,
-            addFrameEvent
-          )
+    const newPipeline = buildWebGL2Pipeline(
+      sourcePlayback,
+      backgroundImageRef.current,
+      backgroundConfig,
+      segmentationConfig,
+      canvasRef.current,
+      tflite,
+      addFrameEvent
+    );
 
     async function render() {
       if (!shouldRender) {
@@ -112,7 +98,7 @@ function useRenderingPipeline(
 
       setPipeline(null)
     }
-  }, [sourcePlayback, backgroundConfig, segmentationConfig, bodyPix, tflite])
+  }, [sourcePlayback, backgroundConfig, segmentationConfig, tflite])
 
   return {
     pipeline,
