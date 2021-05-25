@@ -2,7 +2,7 @@ import {
   compileShader,
   createPiplelineStageProgram,
   createTexture,
-  glsl,
+  glsl
 } from '../helpers/webglHelper'
 
 export type BackgroundBlurStage = {
@@ -95,7 +95,7 @@ function buildBlurPass(
     }
   `
 
-  const scale = 0.5
+  const scale = 0.4
   const outputWidth = canvas.width * scale
   const outputHeight = canvas.height * scale
   const texelWidth = 1 / outputWidth

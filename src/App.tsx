@@ -27,6 +27,7 @@ function App() {
           model: 'meet',
           backend: 'wasm',
           inputResolution: '160x96',
+          // inputResolution: '256x144', // consider using this and the larger model when SIMD is available
           pipeline: 'webgl2'
         };
         ({ webglPipeline } = pipeline(video, canvas, backgroundConfig, segmentationConfig, tflite as TFLite));

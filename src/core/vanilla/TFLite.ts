@@ -45,7 +45,7 @@ export async function getTFLite() {
 
     const modelResponse = await fetch(
       `https://volcomix.github.io/virtual-background/models/segm_lite_v681.tflite`
-      // `https://volcomix.github.io/virtual-background/models/segm_full_v679.tflite`
+      // `https://volcomix.github.io/virtual-background/models/segm_full_v679.tflite` // consider using this and the larger model when SIMD is available
     )
     const model = await modelResponse.arrayBuffer()
     const modelBufferOffset = tflite._getModelBufferMemoryOffset()
