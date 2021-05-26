@@ -18,6 +18,7 @@ function pipeline(
   let frameCount: number = 0
   const frameDurations: number[] = []
 
+  // let interval: any;
   let renderRequestId: number
 
   let webglPipeline = buildWebGL2Pipeline(
@@ -44,9 +45,9 @@ function pipeline(
       endFrame()
       renderRequestId = requestAnimationFrame(render)
     } catch (error) {
-      if (renderRequestId) cancelAnimationFrame(renderRequestId);
-      webglPipeline.cleanUp();
-      throw error;
+      if (renderRequestId) cancelAnimationFrame(renderRequestId)
+      webglPipeline.cleanUp()
+      throw error
     }
   }
 
@@ -75,6 +76,9 @@ function pipeline(
   }
 
   render()
+  // interval = setInterval(() => {
+  //   renderRequestId = requestAnimationFrame(render)
+  // }, 1000 / 30)
 
   return {
     webglPipeline,

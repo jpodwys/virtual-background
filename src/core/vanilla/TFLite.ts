@@ -16,17 +16,13 @@ export interface TFLite extends EmscriptenModule {
 }
 
 export async function getTFLite() {
-  // const [tflite, setTFLite] = useState<TFLite>()
-  // const [tfliteSIMD, setTFLiteSIMD] = useState<TFLite>()
-  // const [selectedTFLite, setSelectedTFLite] = useState<TFLite>()
-  // const [isSIMDSupported, setSIMDSupported] = useState(false)
-
   let tflite: any;
   let isSIMDSupported: boolean = true;
 
   async function loadTFLite() {
     try {
       tflite = await createTFLiteSIMDModule();
+      console.log('WOOT! We\'re using SIMD!')
     } catch (error) {
       isSIMDSupported = false;
       tflite = await createTFLiteModule();
