@@ -1,18 +1,11 @@
-import CssBaseline from '@material-ui/core/CssBaseline'
-import React from 'react'
-import ReactDOM from 'react-dom'
-import App from './App'
-import reportWebVitals from './reportWebVitals'
+import { blur } from './core/vanilla/blur';
+import setupVideo from './core/vanilla/track';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <CssBaseline />
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-)
+async function setup() {
+  const video = document.getElementById('input') as HTMLVideoElement;
+  const canvas = document.getElementById('output') as HTMLCanvasElement;
+  await setupVideo(video, canvas);
+  await blur(video, canvas);
+}
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals()
+setup()
