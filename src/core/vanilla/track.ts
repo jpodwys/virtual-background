@@ -1,4 +1,4 @@
-const setupVideo = (videoElement: HTMLVideoElement): Promise<void> => {
+const setupVideo = (video: HTMLVideoElement, canvas: HTMLCanvasElement): Promise<void> => {
   return new Promise(async (resolve, reject) => {
     const width = 640
     const height = 480
@@ -9,12 +9,14 @@ const setupVideo = (videoElement: HTMLVideoElement): Promise<void> => {
         frameRate: { ideal: 30, max: 30 }
       }
     }
-    videoElement.addEventListener('loadeddata', () => {
-      videoElement.width = width
-      videoElement.height = height
+    video.addEventListener('loadeddata', () => {
+      video.width = width as number;
+      video.height = height as number;
+      canvas.width = width as number;
+      canvas.height = height as number;
       resolve()
     });
-    videoElement.srcObject = await navigator.mediaDevices.getUserMedia(constraints)
+    video.srcObject = await navigator.mediaDevices.getUserMedia(constraints)
   });
 }
 
