@@ -14,9 +14,11 @@
     <title>Virtual Background</title>
     <style>
       body { margin: 0 }
-      video, canvas {
-        max-width: 100vw;
-        max-height: 50vh;
+      @media (max-width: 640px) {
+        video, canvas {
+          max-width: 100vw;
+          max-height: 50vh;
+        }
       }
     </style>
     <script src="%PUBLIC_URL%/tflite/tflite.js"></script>
