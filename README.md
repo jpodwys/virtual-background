@@ -2,6 +2,8 @@
 
 > Google Meet background blur function. Based on volcomix/virtual-background.
 
+[Try it live here!](https://jpodwys.github.io/virtual-background/)
+
 ## Performance
 
 Here are the performance observed for the whole rendering pipelines, including inference and post-processing, when using the device camera on smartphone **Pixel 3 (Chrome)**.
