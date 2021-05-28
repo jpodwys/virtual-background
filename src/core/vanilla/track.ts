@@ -10,10 +10,8 @@ const setupVideo = (video: HTMLVideoElement, canvas: HTMLCanvasElement): Promise
       }
     }
     video.addEventListener('loadeddata', () => {
-      video.width = width as number;
-      video.height = height as number;
-      canvas.width = width as number;
-      canvas.height = height as number;
+      canvas.width = video.videoWidth as number;
+      canvas.height = video.videoHeight as number;
       resolve()
     });
     video.srcObject = await navigator.mediaDevices.getUserMedia(constraints)
