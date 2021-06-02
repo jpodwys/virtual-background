@@ -95,7 +95,7 @@ function buildBlurPass(
     }
   `
 
-  const scale = 0.4
+  const scale = 0.2
   const outputWidth = canvas.width * scale
   const outputHeight = canvas.height * scale
   const texelWidth = 1 / outputWidth
