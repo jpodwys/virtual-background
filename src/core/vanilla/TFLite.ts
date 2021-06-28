@@ -40,8 +40,10 @@ export async function getTFLite() {
     }
 
     const modelResponse = await fetch(
-      `https://volcomix.github.io/virtual-background/models/segm_lite_v681.tflite`
+      // `https://volcomix.github.io/virtual-background/models/segm_lite_v681.tflite`
       // `https://volcomix.github.io/virtual-background/models/segm_full_v679.tflite` // consider using this and the larger model when SIMD is available
+      `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/selfie_segmentation_landscape.tflite`
+      // `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/selfie_segmentation.tflite`
     )
     const model = await modelResponse.arrayBuffer()
     const modelBufferOffset = tflite._getModelBufferMemoryOffset()
