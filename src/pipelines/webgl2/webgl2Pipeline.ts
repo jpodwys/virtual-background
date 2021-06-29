@@ -11,8 +11,8 @@ import {
   buildBackgroundBlurStage
 } from './backgroundBlurStage'
 import { buildJointBilateralFilterStage } from './jointBilateralFilterStage'
+import { buildLoadSegmentationStage } from './loadSegmentationStage'
 import { buildResizingStage } from './resizingStage'
-import { buildSoftmaxStage } from './softmaxStage'
 
 export function buildWebGL2Pipeline(
   video: HTMLVideoElement,
@@ -98,7 +98,7 @@ export function buildWebGL2Pipeline(
     segmentationConfig,
     tflite
   )
-  const loadSegmentationStage = buildSoftmaxStage(
+  const loadSegmentationStage = buildLoadSegmentationStage(
     gl,
     vertexShader,
     positionBuffer,
