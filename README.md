@@ -1,6 +1,6 @@
 # Virtual Background
 
-> Google Meet background blur function. Based on volcomix/virtual-background.
+> Background blur function using media-pipe's selfie-segmentation model. Based on volcomix/virtual-background.
 
 [Try it live here!](https://jpodwys.github.io/virtual-background/)
 
